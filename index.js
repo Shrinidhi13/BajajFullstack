@@ -3,7 +3,7 @@ const path = require("path"); // Add this line to require the path module
 const app = express();
 
 app.use(express.json()); // To parse JSON requests
-
+const port = process.env.PORT || 4000;
 // Serve the frontend HTML file
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'exp.html')); // Ensure the path to index.html is correct
@@ -48,6 +48,6 @@ app.get('/bfhl', (req, res) => {
     });
 });
 
-app.listen(3000, () => {
+app.listen(port, () => {
     console.log("Listening on port 3000!");
 });
