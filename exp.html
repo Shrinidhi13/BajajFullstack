@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Roll Number</title> <!-- Replace "Your Roll Number" with your actual roll number -->
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+
+        .response p {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        /* Limit height for scrolling effect */
+        #filter-select {
+            max-height: 120px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center">API Input Form</h2>
+        <div class="form-group">
+            <label for="api-input">API Input</label>
+            <textarea class="form-control" id="api-input" rows="4">{"data":["M","1","334","4","B"]}</textarea>
+        </div>
+        <button id="submit-btn" class="btn btn-primary btn-block">Submit</button>
+
+        <div class="form-group mt-4">
+            <label for="filter-select">Multi Filter</label>
+            <select class="form-control" id="filter-select" multiple>
+                <option value="numbers">Numbers</option>
+                <option value="alphabets">Alphabets</option>
+                <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
+            </select>
+        </div>
+
+        <div class="response" id="response-container">
+            <h5>Filtered Response</h5>
+            <p id="filtered-response"></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', async () => {
+            try {
+                const apiInput = JSON.parse(document.getElementById('api-input').value);
+                const selectedFilters = Array.from(document.getElementById('filter-select').selectedOptions)
+                    .map(option => option.value);
+
+                const response = await fetch('http://localhost:3000/bfhl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(apiInput)
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                let filteredResponse = '';
+
+                // Check which filters are selected and build the response
+                if (selectedFilters.includes('numbers') && data.numbers) {
+                    filteredResponse += `Numbers: ${data.numbers.join(', ')}<br>`;
+                }
+                if (selectedFilters.includes('alphabets') && data.alphabets) {
+                    filteredResponse += `Alphabets: ${data.alphabets.join(', ')}<br>`;
+                }
+                if (selectedFilters.includes('highest_lowercase_alphabet') && data.highest_lowercase_alphabet) {
+                    filteredResponse += `Highest Lowercase Alphabet: ${data.highest_lowercase_alphabet.join(', ')}<br>`;
+                }
+
+                // Display the result or a message if no filters are selected
+                document.getElementById('filtered-response').innerHTML = filteredResponse || 'No filters selected or no data available.';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('filtered-response').innerHTML = 'An error occurred. Please check the console for details.';
+            }
+        });
+
+        // Update the page title to your roll number
+        document.title = "21BEC0403"; // Replace "ABCD123" with your actual roll number
+    </script>
+</body>
+
+</html>
